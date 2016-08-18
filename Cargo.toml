@@ -1,0 +1,6 @@
+[package]
+name = "brainf_compiler"
+version = "0.1.0"
+authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
+
+[dependencies]

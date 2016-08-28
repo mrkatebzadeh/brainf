@@ -26,3 +26,15 @@ pub struct Info{
     pub position: Option<Position>,
     pub source: Option<String>,
 }
+
+fn position(s: &str, i: usize) -> (usize, usize){
+    let mut char_count = 0;
+    for (line_idx, line) in s.split('\n').enumerate(){
+        let line_length = line.len();
+        if char_count + line_length >= i{
+            return (line_idx, i - char_count);
+        }
+        char_count += line_length + 1;
+    }
+    unreachable!()
+}

@@ -11,6 +11,34 @@ pub struct Position{
     pub end: usize,
 }
 
+#[derive(PartialEq, Eq, Debug, Clone)]
+pub enum AstNode{
+    Increment{
+        amount: Cell,
+        offset: isize,
+        position: Option<Position>,
+    },
+
+    PointerIncrement{
+        amount: isize,
+        position: Option<Position>,
+    },
+
+    Read{
+        position: Option<Position>,
+    },
+
+    Write{
+        position: Option<Position>,
+    },
+
+    Loop{
+        body: Vec<AstNode>,
+        position: Option<Position>,
+    },
+    
+}
+
 pub trait Combine<T>{
     fn combine(&self, T) -> T;
 }
@@ -37,3 +65,4 @@ impl Combine<Option<Position>> for Option<Position>{
         }
     }
 }
+

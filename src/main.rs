@@ -1,3 +1,10 @@
+/*
+ Name        : BrainF Translator
+ Author      : Siavash Katebzadeh
+ Version     : 1
+ Copyright   : GPL v2
+ Description : Main File
+*/
 extern crate getopts;
 #[macro_use]
 extern crate text_io;

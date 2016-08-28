@@ -77,9 +77,15 @@ impl fmt::Display for AstNode{
 
 pub fn get_position(instr: &AstNode) -> Option<Position>{
     match *instr{
-        _ {position, ..} => position,
-        //Fixme
+        Increment { position, .. } => position,
+        PointerIncrement { position, .. } => position,
+        Read { position } => position,
+        Write { position } => position,
+        Loop { position, .. } => position,
+        Set { position, .. } => position,
+        MultiplyMove { position, .. } => position,
     }
+
 }
 
 #[derive(Debug)]

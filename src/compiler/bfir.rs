@@ -21,7 +21,7 @@ pub enum AstNode{
 
     MultiplyMove{
         changes: HashMap<isize, Cell>,
-        position: Option<Position>.
+        position: Option<Position>,
     },
     
     Increment{

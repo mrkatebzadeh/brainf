@@ -39,6 +39,24 @@ pub enum AstNode{
     
 }
 
+fn fmt_with_indent(instr: &AstNode, indent: i32, f: &mut fmt::Formatter){
+    for _ in 0..indent{
+        let _ = write!(f, " ");
+    }
+    match instr{
+        &Loop {body: ref loop_body, position, ..} => {
+            let _ = write!(f, "Loop position: {:?}", position);
+            for loop_instr in loop_body{
+                let _ = write!(f, "\n");
+                fmt_with_indent(loop_instr, indent + 1, f);
+            }
+        }
+        instr => {
+            let _ = write!(f, "{:?}", instr);
+        }
+    }
+}
+
 pub trait Combine<T>{
     fn combine(&self, T) -> T;
 }

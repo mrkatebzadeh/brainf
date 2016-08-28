@@ -1,7 +1,12 @@
 extern crate getopts;
+#[macro_use]
+extern crate text_io;
 use std::env;
-use getopts::{Options, Matches};
+use std::path::Path;
+use getopts::Options;
 
+pub mod interpreter;
+use interpreter::runner;
 fn main() {
     let args: Vec<_> = env::args().collect();
     let mut opts = Options::new();
@@ -17,4 +22,12 @@ fn main() {
             std::process::exit(1);
         }
     };
+    if matches.free.len() == 0 {
+        println!("Please specify a brainf file.");
+        std::process::exit(2);
+    }
+    let ref path =  matches.free[0];
+    println!("{}", path);
+    let path = Path::new(path);
+    runner::interpret(&path)
 }

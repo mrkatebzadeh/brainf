@@ -15,3 +15,14 @@ pub struct ExecutionState<'a>{
     pub cell_ptr: isize,
     pub outputs: Vec<i8>,
 }
+
+impl<'a> ExecutionState<'a>{
+    pub fn initial(instrs: &[AstNode]) -> Self{
+        ExecutionState{
+            start_instr: Node,
+            cells: vec![Wrapping(0); highest_cell_index(instrs) + 1],
+            cell_ptr: 0,
+            outputs: vec![],
+        }
+    }
+}

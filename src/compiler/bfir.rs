@@ -57,6 +57,14 @@ fn fmt_with_indent(instr: &AstNode, indent: i32, f: &mut fmt::Formatter){
     }
 }
 
+impl fmt::Display for AstNode{
+    fn fmt(&self, f: *mut fmt::Formatter) -> fmt::Result{
+        fmt_with_indent(self, 0, f);
+        Ok(())
+    }
+}
+
+
 pub trait Combine<T>{
     fn combine(&self, T) -> T;
 }

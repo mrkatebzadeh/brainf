@@ -34,3 +34,6 @@ pub enum Outcome{
     RuntimeError(Warning),
     OutOfSteps,
 }
+
+pub const MAX_STEPS: u64 = 10000000;
+

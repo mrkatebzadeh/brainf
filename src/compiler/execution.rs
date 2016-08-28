@@ -37,3 +37,15 @@ pub enum Outcome{
 
 pub const MAX_STEPS: u64 = 10000000;
 
+pub fn execute(instrs: &[AstNode], steps: u64) -> (ExecutionState, Option<Warning>){
+    let mut state = ExecutionState::initial(instrs);
+    let outcome = execute_with_state(instrs, &mut state, steps, None);
+    match state.start_instr{
+        Some() => debug_assert!(!matches(outcome, Outcome::Completed(_))),
+        None => debug_assert!(matches(outcome, Outcome::Completed(_))),
+    }
+    match outcome{
+        Outcome::RuntimeError(warning) => (state, Some(warning)),
+        _ => (state, None)
+    }
+}

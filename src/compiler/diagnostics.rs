@@ -17,3 +17,12 @@ pub enum Level{
     Warning,
     Error,
 }
+
+#[derive(Debug)]
+pub struct Info{
+    pub level: Level,
+    pub filename: String,
+    pub message: String,
+    pub position: Option<Position>,
+    pub source: Option<String>,
+}

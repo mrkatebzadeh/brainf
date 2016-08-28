@@ -26,3 +26,11 @@ impl<'a> ExecutionState<'a>{
         }
     }
 }
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Outcome{
+    Completed(u64),
+    ReachedRuntimeValue,
+    RuntimeError(Warning),
+    OutOfSteps,
+}

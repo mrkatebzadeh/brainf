@@ -62,3 +62,56 @@ fn overall_movement(instrs: &[AstNode]) -> (SaturatingInt, SaturatingInt){
     }
     (max_index, net_movement)
 }
+
+fn movement(instr: &AstNode) -> (SaturatingInt, SaturatingInt){
+    match *instr{
+        PointerIncrement{amount, ..} => {
+            if amount < 0{
+                (SaturatingInt::Number(0),
+                SaturatingInt::Number(amount as i64))
+            } else{
+                (SaturatingInt::Number(amount as i64),
+                SaturatingInt::Number(amount as i64))
+            }
+        }
+
+        Increment{offset, ..} => {
+            (SaturatingInt::Number(offset as i64),
+            SaturatingInt::Number(0))
+        }
+
+        Set{offset, ..} => {
+            (SaturatingInt::Number(offset as i64),
+            SaturatingInt::Number(0))
+        }
+
+        MultiplyMove{ref changes, ..} => {
+            let mut highest_affected = 0;
+            for cell in changes.keys(){
+                if *cell > highest_affected {
+                    highest_affected = *cell;
+                }
+            }
+            (SaturatingInt::Number(highest_affected as i64),
+            SaturatingInt::Number(0))
+        }
+        Loop{ref body, ..} => {
+            let (max_in_body, net_in_body) = overall_movement(body);
+            match net_in_body{
+                SaturatingInt::Number(net_loop_movement) => {
+                    if net_loop_movement == 0{
+                        (max_in_body, SaturatingInt::Number(0))
+                    } else if net_loop_movement < 0{
+                        (max_in_body, SaturatingInt::Number(0))
+                    } else{
+                        (SaturatingInt::Max, SaturatingInt::Number(0))
+                    }
+                }
+                SaturatingInt::Max => {
+                    (SaturatingInt::Max, SaturatingInt::Max)
+                }
+            }
+        }
+        Read{..} | Write{..} => (SaturatingInt::Number(0), SaturatingInt::Number(0)),
+    }
+}

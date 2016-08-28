@@ -14,11 +14,23 @@ impl Tape {
     }
 
     pub fn inc(&mut self) {
-        *self.content.get_mut(self.pointer).unwrap() += 1u8;
+        let prev: u8 = *self.content.get_mut(self.pointer).unwrap();
+        let res;
+        match prev.checked_add(1){
+            Some(r) => {res = r;}
+            None => {res = 0;}
+        }
+        *self.content.get_mut(self.pointer).unwrap() = res;
     }
 
     pub fn dec(&mut self) {
-        *self.content.get_mut(self.pointer).unwrap() -= 1u8;
+        let prev: u8 = *self.content.get_mut(self.pointer).unwrap();
+        let res;
+        match prev.checked_sub(1){
+            Some(r) => {res = r;}
+            None => {res = u8::max_value();}
+        }
+        *self.content.get_mut(self.pointer).unwrap() = res;
     }
 
     pub fn next(&mut self) {

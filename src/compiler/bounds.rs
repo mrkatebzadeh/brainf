@@ -28,3 +28,14 @@ enum SaturatingInt{
     Number(i64),
     Max,
 }
+
+impl Add for SaturatingInt{
+    type Output = SaturatingInt;
+    fn add(self, rhs: SaturatingInt) -> SaturatingInt{
+        if let (&SaturatingInt::Number(x), &SaturatingInt::Number(y)) = (&self, &rhs){
+            SaturatingInt::Number(x + y)
+        } else{
+            SaturatingInt::Max
+        }
+    }
+}

@@ -77,6 +77,94 @@ pub struct ParseError{
     pub position: Position,
 }
 
+pub fn parse(source: &str) -> Result<Vec<AstNode>, ParseError>{
+    let mut instructions = vec![];
+    let mut stack = vec![];
+
+    for(index, c) in source.chars().enumerate(){
+        match c{
+            '+' => {
+                instructions.push(Increment{
+                    amount: Wrapping(1),
+                    offset: 0,
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            '-' => {
+                instructions.push(increment{
+                    amount: Wrapping(-1),
+                    offset: 0,
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            '>' => {
+                instructions.push(PointerIncrement{
+                    amount: 1,
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            '<' => {
+                instructions.push(PointerIncrement{
+                    amount: -1,
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            '.' => {
+                instructions.push(Write{
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            ',' => {
+                instructions.push(Read{
+                    position: Some(Position{
+                        start: index,
+                        end: index,
+                    }),
+                })
+            }
+            '[' => {
+                stack.push((instructions, index));
+                instructions = vec![];
+            }
+            ']' => {
+                if let Some((mut parent_instr, open_index)) = stack.pop(){
+                    parent_instr.push(Loop{
+                        body: instructions,
+                        position: Some(Position{
+                            start: open_index,
+                            end: index,
+                        }),
+                    });
+                    instructions = parent_instr;
+                } else{
+                    return Err(ParseError{
+                        message: "This ] has no matching [".to_owned(),
+                        position: Position{
+                            start: index,
+                            end: index,
+                        },
+                    });
+                }
+            }
+            _ => (),
+        }
+    }
+}
 
 pub trait Combine<T>{
     fn combine(&self, T) -> T;

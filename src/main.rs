@@ -26,8 +26,7 @@ fn main() {
         println!("Please specify a brainf file.");
         std::process::exit(2);
     }
-    let ref path =  matches.free[0];
-    println!("{}", path);
-    let path = Path::new(path);
+    // let ref path =  matches.free[0];
+    let path = Path::new(&matches.free[0]);
     runner::interpret(&path)
 }

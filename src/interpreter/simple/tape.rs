@@ -54,10 +54,15 @@ impl Tape {
     }
 
     pub fn read_value(&mut self) {
-        let value: u8;
+        let value: String;
         value = read!("{}\n");
-        // scan!("{}\n", value);
-        self.set_value(value)
+        let res ;
+        if value.len() == 0 {
+            res = self.value();
+        } else {
+            res = value.into_bytes()[0];
+        }
+        self.set_value(res)
     }
 
     fn set_value(&mut self, value: u8) {

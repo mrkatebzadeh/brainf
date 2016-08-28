@@ -10,3 +10,10 @@ pub struct Warning{
     pub message: String,
     pub position: Option<Position>,
 }
+
+#[derive(Debug)]
+#[allow(dead_code)]
+pub enum Level{
+    Warning,
+    Error,
+}

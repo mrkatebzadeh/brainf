@@ -22,3 +22,9 @@ pub fn highest_cell_index(instrs: &[AstNode]) -> usize{
         SaturatingInt::Max => MAX_CELL_INDEX,
     }
 }
+
+#[derive(Eq, PartialEq, Clone, Copy, Debug)]
+enum SaturatingInt{
+    Number(i64),
+    Max,
+}

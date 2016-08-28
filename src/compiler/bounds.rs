@@ -39,3 +39,14 @@ impl Add for SaturatingInt{
         }
     }
 }
+
+impl Ord for SaturatingInt{
+    fn cmp(&self, other: &SaturatingInt) -> Ordering{
+        match(self, other){
+            (&SaturatingInt::Max, &SaturatingInt::Max) => Ordering::Equal,
+            (&SaturatingInt::Number(_), &SaturatingInt::Max) => Ordering::Less,
+            (&SaturatingInt::Max, &SaturatingInt::Number(_)) => Ordering::Greater,
+            (&SaturatingInt::Number(x), &SaturatingInt::Number(y)) => x.cmp(&y),
+        }
+    }
+}

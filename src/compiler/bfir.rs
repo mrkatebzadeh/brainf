@@ -64,7 +64,12 @@ impl fmt::Display for AstNode{
     }
 }
 
-
+pub fn get_position(instr: &AstNode) -> Option<Position>{
+    match *instr{
+        _ {position, ..} => position,
+        //Fixme
+    }
+}
 pub trait Combine<T>{
     fn combine(&self, T) -> T;
 }

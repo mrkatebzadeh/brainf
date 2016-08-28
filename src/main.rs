@@ -33,7 +33,13 @@ fn main() {
         println!("Please specify a brainf file.");
         std::process::exit(2);
     }
+    if !matches.opt_present("i") && !matches.opt_present("c") {
+        println! ("Please select either interpret-mode or compile mode.");
+        std::process::exit(3);
+    }
     // let ref path =  matches.free[0];
     let path = Path::new(&matches.free[0]);
-    runner::interpret(&path)
+    if matches.opt_present("i") {
+        runner::interpret(&path);
+    }    
 }

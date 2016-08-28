@@ -175,6 +175,17 @@ pub fn parse(source: &str) -> Result<Vec<AstNode>, ParseError>{
             _ => (),
         }
     }
+    if !stack.is_empty(){
+        let pos = stack.last().unwrap().1;
+        return Err(ParseError{
+            message: "This [ has now matching ]".to_owned(),
+            position: Position{
+                start: pos,
+                end: pos,
+            },
+        });
+    }
+    Ok(instructions)
 }
 
 pub trait Combine<T>{

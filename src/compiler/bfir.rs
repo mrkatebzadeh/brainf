@@ -70,6 +70,14 @@ pub fn get_position(instr: &AstNode) -> Option<Position>{
         //Fixme
     }
 }
+
+#[derive(Debug)]
+pub struct ParseError{
+    pub message: String,
+    pub position: Position,
+}
+
+
 pub trait Combine<T>{
     fn combine(&self, T) -> T;
 }

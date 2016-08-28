@@ -13,6 +13,17 @@ pub struct Position{
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub enum AstNode{
+    Set{
+        amount: Cell,
+        offset: isize,
+        position: Option<Position>,
+    },
+
+    MultiplyMove{
+        changes: HashMap<isize, Cell>,
+        position: Option<Position>.
+    },
+    
     Increment{
         amount: Cell,
         offset: isize,
@@ -36,7 +47,7 @@ pub enum AstNode{
         body: Vec<AstNode>,
         position: Option<Position>,
     },
-    
+
 }
 
 fn fmt_with_indent(instr: &AstNode, indent: i32, f: &mut fmt::Formatter){

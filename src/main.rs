@@ -5,9 +5,16 @@
  Copyright   : GPL v2
  Description : Main File
 */
+extern crate llvm_sys;
+extern crate itertools;
+extern crate quickcheck;
+extern crate rand;
+extern crate tempfile;
+extern crate ansi_term;
 extern crate getopts;
 #[macro_use]
 extern crate text_io;
+
 use std::env;
 use std::path::Path;
 use getopts::Options;

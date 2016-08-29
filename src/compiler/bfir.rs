@@ -111,7 +111,7 @@ pub fn parse(source: &str) -> Result<Vec<AstNode>, ParseError>{
                 })
             }
             '-' => {
-                instructions.push(increment{
+                instructions.push(Increment{
                     amount: Wrapping(-1),
                     offset: 0,
                     position: Some(Position{

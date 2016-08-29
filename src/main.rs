@@ -37,6 +37,7 @@ fn main() {
     opts.optflag("", "dump-ir", "print BF IR generated");
     opts.optopt("", "llvm-opt", "LLVM optimization level (0 to 3)", "LEVEL");
     opts.optopt("", "passes", "limit branf optimizations to those specified", "PASS-SPECIFICATION");
+    opts.optopt("", "strip", "strip symbols from the binary (default: no)", "yes|no");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,

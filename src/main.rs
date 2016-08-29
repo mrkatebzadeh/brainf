@@ -64,4 +64,7 @@ fn main() {
     if matches.opt_present("i") {
         interpreter::runner::interpret(&path);
     }
+    if matches.opt_present("c"){
+        compiler::runner::compile(&matches);
+    }
 }

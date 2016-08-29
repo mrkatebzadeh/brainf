@@ -13,7 +13,7 @@ use std::path::Path;
 use getopts::Options;
 
 pub mod interpreter;
-use interpreter::runner;
+
 fn main() {
     let args: Vec<_> = env::args().collect();
     let mut opts = Options::new();
@@ -41,5 +41,5 @@ fn main() {
     let path = Path::new(&matches.free[0]);
     if matches.opt_present("i") {
         runner::interpret(&path);
-    }    
+    }
 }

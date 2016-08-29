@@ -1,12 +1,9 @@
-use std::collections::HashMap;
+#![warn(trivial_numeric_casts)]
 use std::num::Wrapping;
-use quickcheck::quickcheck;
-use bfir::{parse, Position};
-use bfir::{AstNode, Cell};
-use bfir::AstNode::*;
-use diagnostics::Warning;
-use bounds::MAX_CELL_INDEX;
-use bounds::highest_cell_index;
+use compiler::bfir::{AstNode, Cell};
+use compiler::bfir::AstNode::*;
+use compiler::diagnostics::Warning;
+use compiler::bounds::highest_cell_index;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExecutionState<'a>{
@@ -138,12 +135,12 @@ pub fn execute_with_state<'a>(instrs: &'a [AstNode],
                 for (cell_offset, factor) in changes {
                     let dest_ptr = cell_ptr as isize + *cell_offset;
                     if dest_ptr < 0 {
-                        state.start_instr = Some(&instrs[instr_idx]);                        
+                        state.start_instr = Some(&instrs[instr_idx]);
                         let message = format!("This multiply loop tried to access cell {} \
                                                (offset {} from current cell {})",
                                               dest_ptr,
                                               *cell_offset,
-                                              cell_ptr);                       
+                                              cell_ptr);
                         return Outcome::RuntimeError(Warning {
                             message: message.to_owned(),
                             position: position,
@@ -159,12 +156,12 @@ pub fn execute_with_state<'a>(instrs: &'a [AstNode],
                                 .to_owned(),
                             position: position,
                         });
-                    }                    
+                    }
                     let current_val = state.cells[dest_ptr as usize];
                     state.cells[dest_ptr as usize] = current_val + cell_value * (*factor);
                 }
                 state.cells[cell_ptr] = Wrapping(0);
-            }       
+            }
             instr_idx += 1;
         }
         steps_left -= 1;
@@ -177,5 +174,5 @@ pub fn execute_with_state<'a>(instrs: &'a [AstNode],
     } else{
         Outcome::Completed(steps_left)
     }
-    
+
 }

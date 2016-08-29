@@ -53,7 +53,7 @@ impl fmt::Display for Info{
         };
         let mut context_line = "".to_owned();
         let mut caret_line = "".to_owned();
-        if let (Some((line_idx, column_idx, width)), &Some(ref source)) = (offset, &self.source){
+        if let (Some((line_idx, column_idx, width)), &Some(ref source)) = (offsets, &self.source){
             let line = source.split('\n').nth(line_idx).unwrap();
             context_line = "\n".to_owned() + &line;
             caret_line = caret_line + "\n";

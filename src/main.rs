@@ -17,7 +17,6 @@ extern crate text_io;
 
 use std::env;
 #[macro_use]
-opts.optflag("v", "version", "print bfc version");
 extern crate matches;
 use std::path::Path;
 use getopts::Options;

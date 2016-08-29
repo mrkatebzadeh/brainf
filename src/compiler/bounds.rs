@@ -2,9 +2,8 @@
 
 use std::ops::Add;
 use std::cmp::{Ord, Ordering, max};
-use bfir::AstNode;
-use bfir::AstNode::*;
-use bfir::{parse, Position};
+use compiler::bfir::AstNode;
+use compiler::bfir::AstNode::*;
 
 pub const MAX_CELL_INDEX: usize = 99999;
 

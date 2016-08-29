@@ -16,6 +16,8 @@ extern crate getopts;
 extern crate text_io;
 
 use std::env;
+#[macro_use]
+extern crate matches;
 use std::path::Path;
 use getopts::Options;
 

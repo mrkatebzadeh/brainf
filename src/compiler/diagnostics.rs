@@ -73,7 +73,7 @@ impl fmt::Display for Info{
                        color.bold().paint(level_text),
                        bold.paint(self.message.clone()),
                        default.paint(context_line),
-                       color.bolc().paint(caret_line)];
+                       color.bold().paint(caret_line)];
         write!(f, "{}", ANSIStrings(&strings))
     }
 }

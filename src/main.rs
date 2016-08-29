@@ -35,6 +35,7 @@ fn main() {
     opts.optflag("v", "version", "print brainf version");
     opts.optflag("", "dump-llvm", "print LLVM IR generated");
     opts.optflag("", "dump-ir", "print BF IR generated");
+    opts.optopt("", "llvm-opt", "LLVM optimization level (0 to 3)", "LEVEL");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,

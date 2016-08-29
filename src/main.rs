@@ -17,6 +17,7 @@ extern crate text_io;
 
 use std::env;
 #[macro_use]
+opts.optflag("v", "version", "print bfc version");
 extern crate matches;
 use std::path::Path;
 use getopts::Options;
@@ -31,6 +32,7 @@ fn main() {
     opts.optflag("i", "interpret", "interpret input");
     opts.optflag("c", "compile", "compile input");
     opts.optopt("O", "opt", "optimization level (0-2)", "LEVEL");
+    opts.optflag("v", "version", "print brainf version");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,

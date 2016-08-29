@@ -16,7 +16,7 @@ pub struct ExecutionState<'a>{
 impl<'a> ExecutionState<'a>{
     pub fn initial(instrs: &[AstNode]) -> Self{
         ExecutionState{
-            start_instr: Node,
+            start_instr: None,
             cells: vec![Wrapping(0); highest_cell_index(instrs) + 1],
             cell_ptr: 0,
             outputs: vec![],

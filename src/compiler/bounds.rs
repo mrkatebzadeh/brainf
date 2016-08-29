@@ -49,6 +49,11 @@ impl Ord for SaturatingInt{
     }
 }
 
+impl PartialOrd for SaturatingInt {
+    fn partial_cmp(&self, other: &SaturatingInt) -> Option<Ordering> {
+       Some(self.cmp(other))
+    }
+}
 fn overall_movement(instrs: &[AstNode]) -> (SaturatingInt, SaturatingInt){
     let mut net_movement = SaturatingInt::Number(0);
     let mut max_index = SaturatingInt::Number(0);

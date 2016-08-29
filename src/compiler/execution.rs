@@ -128,41 +128,42 @@ pub fn execute_with_state<'a>(instrs: &'a [AstNode],
                     }
                 }
             }
-        }
-        MultiplyMove { ref changes, position, .. } => {
-            let cell_value = state.cells[cell_ptr];
-            if cell_value.0 != 0 {
-                for (cell_offset, factor) in changes {
-                    let dest_ptr = cell_ptr as isize + *cell_offset;
-                    if dest_ptr < 0 {
-                        state.start_instr = Some(&instrs[instr_idx]);
-                        let message = format!("This multiply loop tried to access cell {} \
-                                               (offset {} from current cell {})",
-                                              dest_ptr,
-                                              *cell_offset,
-                                              cell_ptr);
-                        return Outcome::RuntimeError(Warning {
-                            message: message.to_owned(),
-                            position: position,
-                        });
+
+            MultiplyMove { ref changes, position, .. } => {
+                let cell_value = state.cells[cell_ptr];
+                if cell_value.0 != 0 {
+                    for (cell_offset, factor) in changes {
+                        let dest_ptr = cell_ptr as isize + *cell_offset;
+                        if dest_ptr < 0 {
+                            state.start_instr = Some(&instrs[instr_idx]);
+                            let message = format!("This multiply loop tried to access cell {} \
+                                                   (offset {} from current cell {})",
+                                                  dest_ptr,
+                                                  *cell_offset,
+                                                  cell_ptr);
+                            return Outcome::RuntimeError(Warning {
+                                message: message.to_owned(),
+                                position: position,
+                            });
+                        }
+                        if dest_ptr as usize >= state.cells.len() {
+                            state.start_instr = Some(&instrs[instr_idx]);
+                            return Outcome::RuntimeError(Warning {
+                                message: format!("This multiply loop tried to access cell {} (the \
+                                                  highest cell is {})",
+                                                 dest_ptr,
+                                                 state.cells.len() - 1)
+                                    .to_owned(),
+                                position: position,
+                            });
+                        }
+                        let current_val = state.cells[dest_ptr as usize];
+                        state.cells[dest_ptr as usize] = current_val + cell_value * (*factor);
                     }
-                    if dest_ptr as usize >= state.cells.len() {
-                        state.start_instr = Some(&instrs[instr_idx]);
-                        return Outcome::RuntimeError(Warning {
-                            message: format!("This multiply loop tried to access cell {} (the \
-                                              highest cell is {})",
-                                             dest_ptr,
-                                             state.cells.len() - 1)
-                                .to_owned(),
-                            position: position,
-                        });
-                    }
-                    let current_val = state.cells[dest_ptr as usize];
-                    state.cells[dest_ptr as usize] = current_val + cell_value * (*factor);
+                    state.cells[cell_ptr] = Wrapping(0);
                 }
-                state.cells[cell_ptr] = Wrapping(0);
+                instr_idx += 1;
             }
-            instr_idx += 1;
         }
         steps_left -= 1;
     }

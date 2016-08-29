@@ -62,6 +62,6 @@ fn main() {
     // let ref path =  matches.free[0];
     let path = Path::new(&matches.free[0]);
     if matches.opt_present("i") {
-        runner::interpret(&path);
+        interpreter::runner::interpret(&path);
     }
 }

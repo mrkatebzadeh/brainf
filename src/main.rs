@@ -38,7 +38,12 @@ fn main() {
     opts.optopt("", "llvm-opt", "LLVM optimization level (0 to 3)", "LEVEL");
     opts.optopt("", "passes", "limit branf optimizations to those specified", "PASS-SPECIFICATION");
     opts.optopt("", "strip", "strip symbols from the binary (default: no)", "yes|no");
-
+    let default_triple_cstring = compiler::llvm::wrapper::get_default_target_triple();
+    let default_triple = default_triple_cstring.to_str().unwrap();
+    opts.optopt("",
+            "target",
+            &format!("LLVM target triple (default: {})", default_triple),
+            "TARGET");
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
         Err(_) => {

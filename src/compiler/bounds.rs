@@ -1,7 +1,5 @@
 #![warn(trivial_numeric_casts)]
-use quickcheck::quickcheck;
-use std::collections::HashMap;
-use std::num::Wrapping;
+
 use std::ops::Add;
 use std::cmp::{Ord, Ordering, max};
 use bfir::AstNode;

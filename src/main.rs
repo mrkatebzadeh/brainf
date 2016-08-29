@@ -13,6 +13,7 @@ use std::path::Path;
 use getopts::Options;
 
 pub mod interpreter;
+pub mod compiler;
 
 fn main() {
     let args: Vec<_> = env::args().collect();

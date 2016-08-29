@@ -47,7 +47,7 @@ impl fmt::Display for Info{
                 debug_assert!(range.start <= range.end);
                 let (line_idx, column_idx) = position(source, range.start);
                 file_text = file_text + &format!(":{}:{}", line_idx + 1, column_idx + 1);
-                Some((line_idx, column_idx, range.end = range.start))
+                Some((line_idx, column_idx, range.end - range.start))
             }
             _ => None,
         };

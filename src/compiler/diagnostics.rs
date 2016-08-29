@@ -51,6 +51,18 @@ impl fmt::Display for Info{
             }
             _ => None,
         };
+        let level_text;
+        let color;
+        match self.level {
+            Level::Warning => {
+                color = Purple;
+                level_text = "warning: ";
+            }
+            Level::Error => {
+                color = Red;
+                level_text = "error:";
+            }
+        }
         let mut context_line = "".to_owned();
         let mut caret_line = "".to_owned();
         if let (Some((line_idx, column_idx, width)), &Some(ref source)) = (offsets, &self.source){

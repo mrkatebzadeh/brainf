@@ -1,0 +1,4 @@
+site_name: BrainF Compiler
+pages:
+- Home: index.md
+theme: cyborg

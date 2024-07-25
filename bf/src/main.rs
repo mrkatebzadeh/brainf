@@ -1,14 +1,9 @@
-use std::{
-    io::{self, Stdout},
-    path::Path,
-};
+use std::{io, path::Path};
 mod args;
 use interpreter::{interpret, read_program};
 
 fn main() -> anyhow::Result<()> {
     let args = args::parse();
-    // let default_triple_cstring = compiler::llvm::wrapper::get_default_target_triple();
-    // let default_triple = default_triple_cstring.to_str().unwrap();
 
     if args.file.is_empty() {
         println!("Please specify a BF file.");
@@ -26,7 +21,7 @@ fn main() -> anyhow::Result<()> {
         let mut stdout = io::stdout().lock();
         interpret(content, &mut stdout);
     } else if args.compile {
-        // compiler::runner::compile(&args);
+        todo!()
     }
     Ok(())
 }

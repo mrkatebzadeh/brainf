@@ -3,13 +3,16 @@ mod tape;
 
 use anyhow::Context;
 use program::Program;
-use std::{fs::File, io::Read, path::Path};
+use std::{
+    fs::File,
+    io::{Read, Write},
+    path::Path,
+};
 use tape::Tape;
 
-pub fn interpret(content: Vec<char>) -> String {
+pub fn interpret<W: Write>(content: Vec<char>, stream: &mut W) {
     let mut program = Program::new(content);
     let mut tape = Tape::new();
-    let mut stdout = String::new();
 
     while !program.finished() {
         match program.command() {
@@ -17,7 +20,11 @@ pub fn interpret(content: Vec<char>) -> String {
             '-' => tape.dec(),
             '>' => tape.next(),
             '<' => tape.prev(),
-            '.' => stdout.push(tape.value() as char),
+            '.' => {
+                stream
+                    .write(format!("{}", tape.value() as char).as_bytes())
+                    .unwrap();
+            }
             ',' => tape.read_value(),
             '[' if tape.zero() => program.fast_forward(1),
             ']' if tape.not_zero() => program.rewind(1),
@@ -26,8 +33,6 @@ pub fn interpret(content: Vec<char>) -> String {
 
         program.forward();
     }
-
-    stdout
 }
 
 pub fn read_program(path: &Path) -> anyhow::Result<Vec<char>> {
@@ -41,6 +46,8 @@ pub fn read_program(path: &Path) -> anyhow::Result<Vec<char>> {
 #[cfg(test)]
 
 mod tests {
+    use std::io::Cursor;
+
     use super::*;
 
     #[test]
@@ -51,8 +58,9 @@ mod tests {
 +++++ +++++
 +++
 ..";
-        let res = interpret(content.chars().collect());
-        assert_eq!(res, "!!");
+        let mut stream = Cursor::new(vec![0, 200]);
+        interpret::<Cursor<Vec<u8>>>(content.chars().collect(), &mut stream);
+        assert_eq!(stream.get_ref(), "!!".as_bytes());
     }
 
     #[test]
@@ -102,7 +110,8 @@ mod tests {
 >++++++++[<+++++++++++>-]<-.>++[<----------->-]<.+++++++++++
 ..>+++++++++[<---------->-]<-----.---.+++.---.[-]<<<]
 ";
-        let res = interpret(content.chars().collect());
+        let mut stream = Cursor::new(vec![0, 200]);
+        interpret(content.chars().collect(), &mut stream);
         let expected = "99 Bottles of beer on the wall
 99 Bottles of beer
 Take one down and pass it around
@@ -600,6 +609,6 @@ Take one down and pass it around
 
 "
         .replace("\n", "\r\n");
-        assert_eq!(res, expected);
+        assert_eq!(stream.get_ref(), expected.as_bytes());
     }
 }

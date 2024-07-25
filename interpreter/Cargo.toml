@@ -6,4 +6,4 @@ authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
 
 [dependencies]
 text_io = "0.1.5"
-anyhow = "1.0.86"
+anyhow = { workspace = true }

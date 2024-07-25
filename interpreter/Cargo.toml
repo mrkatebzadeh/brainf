@@ -1,0 +1,9 @@
+[package]
+name = "interpreter"
+version = "0.1.1"
+edition = "2021"
+authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
+
+[dependencies]
+text_io = "0.1.5"
+anyhow = "1.0.86"

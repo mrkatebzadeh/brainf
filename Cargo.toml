@@ -1,15 +1,6 @@
-[package]
-name = "brainf_compiler"
-version = "0.1.0"
-authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
+[workspace]
+resolver = "2"
 
-[dependencies]
-llvm-sys = "*"
-itertools = "*"
-rand = "*"
-quickcheck = "*"
-tempfile = "*"
-getopts = "*"
-matches = "*"
-ansi_term = "*"
-text_io = "*"
+members = [
+  "interpreter"
+]

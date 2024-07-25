@@ -1,8 +1,10 @@
 use std::iter;
-extern crate text_io;
+
+use text_io::read;
+
 pub struct Tape {
     content: Vec<u8>,
-    pointer: usize
+    pointer: usize,
 }
 
 impl Tape {
@@ -16,9 +18,13 @@ impl Tape {
     pub fn inc(&mut self) {
         let prev: u8 = *self.content.get_mut(self.pointer).unwrap();
         let res;
-        match prev.checked_add(1){
-            Some(r) => {res = r;}
-            None => {res = 0;}
+        match prev.checked_add(1) {
+            Some(r) => {
+                res = r;
+            }
+            None => {
+                res = 0;
+            }
         }
         *self.content.get_mut(self.pointer).unwrap() = res;
     }
@@ -26,9 +32,13 @@ impl Tape {
     pub fn dec(&mut self) {
         let prev: u8 = *self.content.get_mut(self.pointer).unwrap();
         let res;
-        match prev.checked_sub(1){
-            Some(r) => {res = r;}
-            None => {res = u8::max_value();}
+        match prev.checked_sub(1) {
+            Some(r) => {
+                res = r;
+            }
+            None => {
+                res = u8::max_value();
+            }
         }
         *self.content.get_mut(self.pointer).unwrap() = res;
     }
@@ -56,7 +66,7 @@ impl Tape {
     pub fn read_value(&mut self) {
         let value: String;
         value = read!("{}\n");
-        let res ;
+        let res;
         if value.len() == 0 {
             res = self.value();
         } else {

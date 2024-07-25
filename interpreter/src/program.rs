@@ -1,23 +1,18 @@
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-
 pub struct Program {
     content: Vec<char>,
-    pub pointer: usize
+    pub pointer: usize,
 }
 
 impl Program {
-    pub fn new(file_path: &Path) -> Program {
-        let content = Program::read_program(file_path);
+    pub fn new(content: Vec<char>) -> Program {
         Program {
-            content: content,
-            pointer: 0
+            content,
+            pointer: 0,
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.content.len()
+    pub fn finished(&self) -> bool {
+        self.pointer == self.content.len() as usize
     }
 
     pub fn forward(&mut self) {
@@ -39,7 +34,7 @@ impl Program {
             match self.command() {
                 ']' => self.fast_forward(count - 1),
                 '[' => self.fast_forward(count + 1),
-                 _  => self.fast_forward(count)
+                _ => self.fast_forward(count),
             }
         }
     }
@@ -51,20 +46,8 @@ impl Program {
             match self.command() {
                 '[' => self.rewind(count - 1),
                 ']' => self.rewind(count + 1),
-                 _  => self.rewind(count)
+                _ => self.rewind(count),
             }
         }
-    }
-
-    fn read_program(path: &Path) -> Vec<char> {
-        
-        let mut buffer = String::new();
-        
-        let mut file = File::open(path).expect("Could not open the file!");
-        file.read_to_string(&mut buffer);
-        // let mut content: Vec<char> = Vec::new();
-        buffer.chars().collect()
-        
-
     }
 }

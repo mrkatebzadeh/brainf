@@ -2,5 +2,9 @@
 resolver = "2"
 
 members = [
-  "interpreter"
+  "interpreter",
+  "bf"
 ]
+
+[workspace.dependencies]
+anyhow = "1.0.86"

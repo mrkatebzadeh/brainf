@@ -1,0 +1,10 @@
+[package]
+name = "bf"
+version = "0.1.1"
+edition = "2021"
+authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
+
+[dependencies]
+interpreter = { path = "../interpreter" }
+anyhow = {workspace = true }
+clap = { version = "4.5.9", features = ["derive"] }

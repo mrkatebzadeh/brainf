@@ -1,6 +1,15 @@
 use std::{io, path::Path};
 mod args;
 use interpreter::{interpret, read_program};
+use std::path::PathBuf;
+
+fn dump_ir(src: &str) {
+    let ir = compiler::parse_to_ir(src);
+    let ir = compiler::optimize(ir);
+    for op in ir {
+        println!("{:?}", op);
+    }
+}
 
 fn main() -> anyhow::Result<()> {
     let args = args::parse();
@@ -21,7 +30,13 @@ fn main() -> anyhow::Result<()> {
         let mut stdout = io::stdout().lock();
         interpret(content, &mut stdout);
     } else if args.compile {
-        todo!()
+        let content = std::fs::read_to_string(path)?;
+        if args.dump_ir {
+            dump_ir(&content);
+        }
+        let out = PathBuf::from("a.out");
+        compiler::compile_to_exe(&content, &out)?;
+        println!("{}", out.display());
     }
     Ok(())
 }

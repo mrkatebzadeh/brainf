@@ -8,3 +8,4 @@ authors = ["Siavash Katebzadeh <mr.katebzadeh@gmail.com>"]
 interpreter = { path = "../interpreter" }
 anyhow = {workspace = true }
 clap = { version = "4.5.9", features = ["derive"] }
+compiler = { path = "../compiler" }

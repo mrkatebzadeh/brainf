@@ -11,6 +11,7 @@ pub enum Op {
     Out,
     In,
     Clear,
+    Set(i32),
     AddAt(i32, i32),
     MulAdd(Vec<(i32, i32)>),
     Scan(i32),
@@ -194,7 +195,26 @@ pub fn optimize(mut ops: Vec<Op>) -> Vec<Op> {
                 }
             }
         }
-        ops = out;
+        // Clear+Inc -> Set
+        let mut out2 = Vec::new();
+        let mut j = 0;
+        while j < out.len() {
+            if j + 1 < out.len() {
+                if let (Op::Clear, Op::Inc(n)) = (&out[j], &out[j + 1]) {
+                    let mut v = *n % 256;
+                    if v < 0 {
+                        v += 256;
+                    }
+                    out2.push(Op::Set(v));
+                    j += 2;
+                    changed = true;
+                    continue;
+                }
+            }
+            out2.push(out[j].clone());
+            j += 1;
+        }
+        ops = out2;
     }
 
     ops
@@ -276,6 +296,13 @@ fn emit_c_ops(ops: &[Op], out: &mut String, _depth: usize) {
             Op::Out => out.push_str("putchar(t[p]);\n"),
             Op::In => out.push_str("{int c=getchar(); if(c!=EOF) t[p]=c; }\n"),
             Op::Clear => out.push_str("t[p]=0;\n"),
+            Op::Set(v) => {
+                let mut vv = v % 256;
+                if vv < 0 {
+                    vv += 256;
+                }
+                out.push_str(&format!("t[p]={};\n", vv));
+            }
             Op::AddAt(off, amt) => {
                 if amt != 0 {
                     if off >= 0 {
@@ -352,6 +379,13 @@ mod tests {
         let ir = parse_to_ir("[>]");
         let opt = optimize(ir);
         assert_eq!(opt, vec![Op::Scan(1)]);
+    }
+
+    #[test]
+    fn set_after_clear() {
+        let ir = vec![Op::Clear, Op::Inc(65)];
+        let opt = optimize(ir);
+        assert_eq!(opt, vec![Op::Set(65)]);
     }
 
     #[test]

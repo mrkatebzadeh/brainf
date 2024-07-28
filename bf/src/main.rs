@@ -34,8 +34,17 @@ fn main() -> anyhow::Result<()> {
         if args.dump_ir {
             dump_ir(&content);
         }
-        let out = PathBuf::from("a.out");
-        compiler::compile_to_exe(&content, &out)?;
+        let out = if let Some(s) = &args.output {
+            PathBuf::from(s)
+        } else {
+            path.with_extension("out")
+        };
+        let level = if args.optimizatoin > 2 {
+            2
+        } else {
+            args.optimizatoin
+        };
+        compiler::compile_to_exe(&content, &out, level)?;
         println!("{}", out.display());
     }
     Ok(())

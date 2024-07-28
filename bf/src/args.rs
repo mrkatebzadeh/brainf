@@ -37,6 +37,9 @@ pub(crate) struct Args {
 
     #[arg(short = 'f', long, help = "BF input file")]
     pub file: String,
+
+    #[arg(short = 'o', long, help = "Output executable path (compile mode)")]
+    pub output: Option<String>,
 }
 
 impl fmt::Display for Args {

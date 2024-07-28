@@ -9,6 +9,7 @@ pub enum Op {
     Inc(i32),
     Move(i32),
     Out,
+    OutImm(i32),
     In,
     Clear,
     Set(i32),
@@ -220,6 +221,135 @@ pub fn optimize(mut ops: Vec<Op>) -> Vec<Op> {
     ops
 }
 
+pub fn optimize_with_level(mut ops: Vec<Op>, level: u32) -> Vec<Op> {
+    for op in ops.iter_mut() {
+        if let Op::Loop(inner) = op {
+            let o = optimize_with_level(inner.clone(), level);
+            *inner = o;
+        }
+    }
+
+    if level >= 1 && ops.len() == 1 {
+        if let Op::Loop(inner) = &ops[0] {
+            if inner.len() == 1 {
+                match inner[0] {
+                    Op::Inc(n) if n == 1 || n == -1 => return vec![Op::Clear],
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    let mut changed = true;
+    while changed {
+        changed = false;
+        let mut out = Vec::new();
+        let mut i = 0;
+        while i < ops.len() {
+            match ops[i].clone() {
+                Op::Inc(mut n) => {
+                    let mut j = i + 1;
+                    while j < ops.len() {
+                        match ops[j] {
+                            Op::Inc(m) => {
+                                n += m;
+                                j += 1;
+                            }
+                            _ => break,
+                        }
+                    }
+                    if n != 0 {
+                        out.push(Op::Inc(n));
+                    }
+                    i = j;
+                    continue;
+                }
+                Op::Move(mut n) => {
+                    let mut j = i + 1;
+                    while j < ops.len() {
+                        match ops[j] {
+                            Op::Move(m) => {
+                                n += m;
+                                j += 1;
+                            }
+                            _ => break,
+                        }
+                    }
+                    if n != 0 {
+                        out.push(Op::Move(n));
+                    }
+                    i = j;
+                    continue;
+                }
+                Op::Loop(inner) => {
+                    if level >= 2 && is_move_add_loop(&inner) {
+                        let moves = decode_move_add(&inner);
+                        out.push(Op::MulAdd(moves));
+                        out.push(Op::Clear);
+                        changed = true;
+                        i += 1;
+                        continue;
+                    }
+                    if level >= 2 && inner.len() == 1 {
+                        match inner[0] {
+                            Op::Move(d) if d == 1 || d == -1 => {
+                                out.push(Op::Scan(d));
+                                changed = true;
+                                i += 1;
+                                continue;
+                            }
+                            _ => {}
+                        }
+                    }
+                    out.push(Op::Loop(inner));
+                    i += 1;
+                }
+                other => {
+                    out.push(other);
+                    i += 1;
+                }
+            }
+        }
+        // Clear+Inc -> Set
+        let mut out2 = Vec::new();
+        let mut j = 0;
+        while j < out.len() {
+            if level >= 2 && j + 1 < out.len() {
+                if let (Op::Clear, Op::Inc(n)) = (&out[j], &out[j + 1]) {
+                    let mut v = *n % 256;
+                    if v < 0 {
+                        v += 256;
+                    }
+                    out2.push(Op::Set(v));
+                    j += 2;
+                    changed = true;
+                    continue;
+                }
+            }
+            out2.push(out[j].clone());
+            j += 1;
+        }
+        // Set followed by Out -> Set + OutImm
+        let mut out3 = Vec::new();
+        let mut k = 0;
+        while k < out2.len() {
+            if level >= 2 && k + 1 < out2.len() {
+                if let (Op::Set(v), Op::Out) = (&out2[k], &out2[k + 1]) {
+                    out3.push(Op::Set(*v));
+                    out3.push(Op::OutImm(*v));
+                    k += 2;
+                    changed = true;
+                    continue;
+                }
+            }
+            out3.push(out2[k].clone());
+            k += 1;
+        }
+        ops = out3;
+    }
+    ops
+}
+
 fn is_move_add_loop(inner: &[Op]) -> bool {
     // pattern: sequence of Inc/Move ending with Move back to origin and net Inc at origin -1
     // minimal: Inc(-1) then balanced moves and positive adds elsewhere
@@ -294,6 +424,7 @@ fn emit_c_ops(ops: &[Op], out: &mut String, _depth: usize) {
                 }
             }
             Op::Out => out.push_str("putchar(t[p]);\n"),
+            Op::OutImm(v) => out.push_str(&format!("putchar({});\n", v)),
             Op::In => out.push_str("{int c=getchar(); if(c!=EOF) t[p]=c; }\n"),
             Op::Clear => out.push_str("t[p]=0;\n"),
             Op::Set(v) => {
@@ -337,9 +468,9 @@ fn emit_c_ops(ops: &[Op], out: &mut String, _depth: usize) {
     }
 }
 
-pub fn compile_to_exe(src: &str, out_exe: &Path) -> Result<()> {
+pub fn compile_to_exe(src: &str, out_exe: &Path, opt_level: u32) -> Result<()> {
     let ir = parse_to_ir(src);
-    let ir = optimize(ir);
+    let ir = optimize_with_level(ir, opt_level);
     let code = gen_c(&ir);
     let mut c_path = PathBuf::from(out_exe);
     c_path.set_extension("c");
@@ -363,29 +494,39 @@ mod tests {
     #[test]
     fn clear_loop() {
         let ir = parse_to_ir("[-]");
-        let opt = optimize(ir);
+        let opt = optimize_with_level(ir, 2);
         assert_eq!(opt, vec![Op::Clear]);
     }
 
     #[test]
     fn move_add_basic() {
         let ir = parse_to_ir("[->+<]");
-        let opt = optimize(ir);
+        let opt = optimize_with_level(ir, 2);
         assert_eq!(opt, vec![Op::MulAdd(vec![(1, 1)]), Op::Clear]);
     }
 
     #[test]
     fn scan_right() {
         let ir = parse_to_ir("[>]");
-        let opt = optimize(ir);
+        let opt = optimize_with_level(ir, 2);
         assert_eq!(opt, vec![Op::Scan(1)]);
     }
 
     #[test]
     fn set_after_clear() {
         let ir = vec![Op::Clear, Op::Inc(65)];
-        let opt = optimize(ir);
+        let opt = optimize_with_level(ir, 2);
         assert_eq!(opt, vec![Op::Set(65)]);
+    }
+
+    #[test]
+    fn set_then_out_becomes_outimm_and_set_kept() {
+        let ir = vec![Op::Set(65), Op::Out];
+        let opt = optimize_with_level(ir, 2);
+        assert_eq!(opt, vec![Op::Set(65), Op::OutImm(65)]);
+        let c = gen_c(&opt);
+        assert!(c.contains("t[p]=65;"));
+        assert!(c.contains("putchar(65);"));
     }
 
     #[test]
@@ -393,7 +534,7 @@ mod tests {
         let src = "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.";
         let dir = tempfile::tempdir()?;
         let exe = dir.path().join("hello");
-        compile_to_exe(src, &exe)?;
+        compile_to_exe(src, &exe, 2)?;
         let out = Command::new(&exe).output()?;
         assert!(out.status.success());
         assert_eq!(String::from_utf8_lossy(&out.stdout), "Hello World!\n");
